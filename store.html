@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simple cash register built with HTML/CSS and vanilla JS.">
+    <link rel="stylesheet" href="./style.css">
+    <script src="./script.js" defer></script>
+</head>
+<body>
+    <style>
+        @font-face {
+    font-family: 'DSDIGI';
+    src: url('./font/DSDIGI.eot');
+    src: local('DSDIGI'), url('./font/DSDIGI.woff') format('woff'), url('./font/DSDIGI.ttf') format('truetype');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    background-color: hotpink;
+    background-image: lightred( 179deg,  rgba(255, 196, 2, 0.9) 9.6%, rgba(243, 206, 71, 0.8) 50.1% );
+}
+
+.openbtn {
+    position: fixed;
+    top: 0;
+    left: 0;
+    font-size: 1.5rem;
+    cursor: pointer;
+    background-color: rgba(17, 17, 17, 0.9);
+    color: blanchedalmond;
+    padding: 10px 15px;
+    border: none;
+    outline: none;
+    z-index: 1;
+}
+
+.openbtn:hover {
+    background-color: rgba(17, 17, 17, 0.7);
+}
+
+.register__cash__sidebar {
+    height: 100vh;
+    width: 0;
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    background-color:black;
+    background-image:
+    radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+    radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+    radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px),
+    radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px);
+    background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px;
+    background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    /* display: flex; */
+}
+
+.register__cash__sidebar .closebtn {
+    cursor: pointer;
+    position: absolute;
+    background: none;
+    outline: none;
+    border: none;
+    top: 0;
+    right: 0;
+    font-size: 1.5rem;
+    padding: 12px 15px;
+}
+
+.register__cash__form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: whitesmoke;
+}
+
+.register__cash__form > h3 {
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.register__cash__form > fieldset {
+    border: none;
+    outline: none;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.register__cash__form > fieldset > input {
+    width: 150px;
+    padding: 3px 5px;
+    border: 1px solid rgba(255, 136, 0, 0.9);
+    border-radius: 5px;
+    font-size: 1.5rem;
+    font-family: 'DSDIGI' !important;
+    text-align: center;
+}
+
+.register__cash__form > button {
+    width: 150px;
+    margin-bottom: 10px;
+    padding: 10px 0;
+    background-color: rgba(255, 187, 0, 1);
+    cursor: pointer;
+    color: black;
+    outline: none;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: none;
+}
+
+.register__cash__form > button:hover {
+    background-color: hotpink(255, 187, 0, 0.9)
+}
+
+.register__cash__form > a.reset {
+    text-decoration: none;
+    color: rgba(245, 245, 245, 0.9);
+}
+
+.register__cash__form > a.reset:hover {
+    color: rgba(255, 187, 0, 0.9);
+}
+
+.register__cash__form > .reset__register {
+    margin-top: 50px;
+}
+
+.container__grid {
+    display: grid;
+    grid-template-columns: auto 200px;
+    grid-template-rows: 60px 160px auto auto;
+    column-gap: 15px;
+    row-gap: 1.2em;
+    justify-content: center;
+    align-content: center;
+    min-height: 100vh;
+}
+
+.entries__container {
+    grid-column-start: 2; 
+    grid-column-end: 3; 
+    grid-row-start: 3; 
+    grid-row-end: 5;
+    background-color: rgba(245, 245, 245, 0.7);
+    padding: 10px;
+    border: 3px solid rgba(3, 77, 162, 0.9);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.entries__container > h4, .summary__container > h4 {
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    word-wrap: break-word;
+}
+
+.entries__container > .entries {
+    max-height: 250px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    font-size: .9rem;
+}
+
+.entries__container > .entries .entrie__section {
+    margin-bottom: 5px; 
+    padding: 0 0 3px 3px;
+    border-bottom: 1px solid rgba(90, 126, 167, 0.5);
+    position: relative;
+}
+
+.entries__container > .entries .entrie__section:last-child {
+    margin-bottom: 0; 
+}
+
+.entrie__voidMode::before {
+    content: 'VOID';
+    font-size: .6rem;
+    color: rgba(255, 0, 0, 0.9);
+    position: absolute;
+    top: 3px;
+    right: 3px;
+}
+
+.summary__container {
+    grid-column-start: 2; 
+    grid-column-end: 3; 
+    grid-row-start: 1; 
+    grid-row-end: 3;
+    background-color: rgba(245, 245, 245, 0.7);
+    padding: 10px;
+    border: 3px solid rgba(3, 77, 162, 0.9);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.summary__container > .summary__copy {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 5px;
+    font-size: 1rem;
+}
+
+.summary__container > .entries {
+    max-height: 160px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    font-size: .9rem;
+}
+
+.entries__container > .entries::-webkit-scrollbar,
+.summary__container > .entries::-webkit-scrollbar {
+    display: none;
+}
+
+.header {
+    background-color: rgba(255, 235, 161, 0.7);
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+    box-shadow: 0 0 1em rgba(0, 0, 0, 0.2);
+}
+
+.header > .logo {
+    object-fit: contain;
+    height: 60px;
+}
+
+.screen {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    flex-direction: column;
+    background-color: rgba(230, 231, 232, 0.9);
+    padding: 10px;
+    font-family: 'DSDIGI' !important;
+    font-size: 3rem;
+    color:#030303;
+    word-wrap: break-word;
+    word-break: break-all;
+    position: relative;
+    border: 3px solid rgba(3, 77, 162, 0.9);
+    border-radius: 10px;
+}
+
+.screen > .screen__reset,
+.screen > .screen__cancel {
+    position: absolute;
+    top: 0;
+    right: 50%;
+    transform: translateX(50%);
+    box-shadow: none;
+    border: 3px solid rgba(3, 77, 162, 0.9);
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 5px 10px;
+    font-size: 1.1rem;
+    background-color: rgba(3, 77, 162, 0.9);
+    color: whitesmoke;
+    letter-spacing: 3px;
+}
+
+.screen > .screen__reset:hover,
+.screen > .screen__cancel:hover {
+    background-color: rgba(3, 77, 162, 1);
+    box-shadow: none;
+}
+
+.voidMode {
+    background-color: rgba(250, 223, 212, 0.9);
+    border: 3px solid rgba(255, 0, 0, 0.9);
+}
+
+.voidMode::before {
+    content: 'VOID MODE';
+    position: absolute;
+    top: 0;
+    right: 5px;
+    font-size: 1.2rem;
+    color: rgba(255, 0, 0, 0.9);
+}
+
+.hidden {
+    display: none;
+}
+
+.screen .screen__top::before, .screen .screen__bottom::before {
+    content: attr(data-before);
+    position: absolute;
+    left: 10px;
+}
+
+.keypad, .keypad__options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
+}
+
+.keypad__left, .keypad__options__left {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 10px;
+    row-gap: 1.2em;
+}
+
+.keypad__options__left {
+    row-gap: 0;
+}
+
+.keypad__options__left > h4 {
+    text-align: center;
+    text-transform: uppercase;
+    color: rgba(3, 77, 162, 0.9);;
+    word-spacing: 15px;
+    letter-spacing: 8px;
+    padding-bottom: 5px;
+}
+
+.container__grid button {
+    background-color: rgba(245, 245, 245, 0.9);
+    cursor: pointer;
+    color: black;
+    outline: none;
+    font-size: 2rem;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 8px 0 0 rgba(211, 211, 211, 0.9);
+}
+
+.container__grid button:hover {
+    background-color: rgba(245, 245, 245, 0.5);
+    box-shadow: 0 8px 0 0 rgba(211, 211, 211, 0.5);
+}
+
+.container__grid button:disabled {
+    background-color: rgba(119, 136, 153, 0.5);
+    cursor: not-allowed;
+}
+
+.keypad__right > button, .keypad__options__left > button {
+    padding: 5px;
+    font-size: 1.5rem;
+}
+
+.keypad__right, .keypad__options__right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
+    row-gap: 1.2em;
+}
+
+.span-2 {
+    grid-column: span 2;
+}
+
+.span-3 {
+    grid-column: span 3;
+}
+
+/* COLORS */
+
+.enter {
+    background-color: rgba(0, 128, 0, 0.9) !important;
+    color: whitesmoke !important;
+}
+
+.enter:hover {
+    background-color: rgba(0, 128, 0, 0.5) !important;
+}
+
+.enter:disabled {
+    background-color: rgba(119, 136, 153, 0.5) !important;
+    color: black !important;
+    cursor: not-allowed !important;
+}
+
+.lightgreen {
+    background-color: rgba(118, 240, 118, 0.9) !important;
+}
+
+.lightgreen:hover {
+    background-color: rgba(118, 240, 118, 0.5) !important;
+}
+
+.darkgreen {
+    background-color: rgba(0, 100, 0, 0.9) !important;
+    color: whitesmoke !important;
+}
+
+.darkgreen:hover {
+    background-color: rgba(0, 100, 0, 0.5) !important;
+}
+
+.lightblue {
+    background-color: rgba(99, 192, 253, 0.9) !important;
+}
+
+.lightblue:hover {
+    background-color: rgba(99, 191, 253, 0.5) !important;
+}
+
+.lightyellow {
+    background-color: rgba(253, 255, 124, 0.9) !important;
+}
+
+.lightyellow:hover {
+    background-color: rgba(253, 255, 124, 0.5) !important;
+}
+
+.lightred {
+    background-color: rgba(255, 140, 169, 0.9) !important;
+}
+
+.lightred:hover {
+    background-color: rgba(255, 140, 169, 0.5) !important;
+}
+
+.lightgray {
+    background-color: rgba(105, 105, 105, 0.9) !important;
+    color: gainsboro !important;
+    font-size: 1.5rem !important;
+}
+
+.lightgray:hover {
+    background-color: rgba(105, 105, 105, 0.5) !important;
+}
+
+.lightgreen:disabled,
+.darkgreen:disabled,
+.lightblue:disabled,
+.lightyellow:disabled,
+.lightred:disabled,
+.lightgray:disabled {
+    cursor: none !important;
+    background-color: rgba(119, 136, 153, 0.5) !important;
+    cursor: not-allowed !important;
+    color: black !important;
+}
+
+.darkyellow__text {
+    color: #574000;
+    font-weight: 600;
+}
+
+.red__text {
+    color: rgb(218, 0, 0);
+}
+
+.green__text {
+    color: darkgreen;
+}
+
+.green__textBold {
+    color: darkgreen;
+    font-weight: 600;
+}
+
+.voidBtnOn {
+    background-color: rgba(139, 0, 0, 1) !important;
+    color: rgba(245, 245, 245, 0.9) !important;
+}
+    </style>
+
+    <!-- Sidebar -->
+    <button class="openbtn" data-open>💰 Iniial Amount</button>
+    <div data-sidebar class="register__cash__sidebar">
+        <button class="closebtn" data-close>❌</button>
+        <form action="#" class="register__cash__form" data-cash-init-form>
+            <h3>Initial Amount</h3>
+            <fieldset>
+                <input type="text" value="0" data-cash-init-value required>
+            </fieldset>
+            <button type="submit" data-cash-init-submit>Register</button>
+            <a href="#" class="reset" data-cash-init-clear>Modify Initial Amount</a>
+            <button class="reset__register" data-register-reset>⚠️ Reset Cash Register</button>
+        </form>
+    </div>
+
+    <!--main content grid -->
+    <div class="container__grid">
+        <div class="entries__container">
+            <h4>Entries (<span data-entries-count>0</span>)</h4>
+            <div class="entries" data-entries></div>
+        </div>
+        <div class="summary__container">
+            <div class="summary__copy" title="Copy Register Summary to clipboard" data-copy-btn>📋</div>
+            <h4>Summary <span data-date></span></h4>
+            <div class="entries" data-area-clipboard>
+                <strong>TRANSACTIONS</strong><br>
+                <span class="darkyellow__text">Initial Amount &raquo;&raquo; <span data-init-value>0.00</span></span><br>
+                Freshly Baked Bread &raquo;&raquo; <span data-Freshly Baked Bread-total>0.00</span><br>
+                Whole Wheat loaf &raquo;&raquo; <span data-Whole Wheat loaf-total>0.00</span><br>
+                Cake &raquo;&raquo; <span data-Cake-total>0.00</span><br>
+                Vanilla Cupcake &raquo;&raquo; <span data-Vanilla cupcake-total>0.00</span><br>
+                Chocolate cake &raquo;&raquo; <span data-chocolate cake-total>0.00</span><br>
+                <span class="green__text">Money-In &raquo;&raquo; <span data-money-in-total>0.00</span></span><br>
+                <span class="red__text">Money-Out &raquo;&raquo; <span data-money-out-total>0.00</span></span><br>
+                <span class="red__text">Void &raquo;&raquo; <span data-voids-total>0.00</span></span><br>
+                <strong>PAYMENT METHODS</strong><br>
+                Cash &raquo;&raquo; <span data-payment-cash-total>0.00</span><br>
+                Check &raquo;&raquo; <span data-payment-check-total>0.00</span><br>
+                Card &raquo;&raquo; <span data-payment-card-total>0.00</span><br>
+                <strong>GRAND TOTAL</strong><br>
+                <span class="green__textBold">Total &raquo;&raquo; £ <span data-grand-total>0.00</span></span>
+            </div>
+        </div>
+        <div class="header">
+             <title>My Store</title>
+
+            <img class="logo" src="logo.jpg" alt="Imporpernos Logo">
+        </div>
+        <div class="screen" data-display>
+            <button class="screen__reset hidden" data-restart>Restart 🔄</button>
+            <button class="screen__cancel hidden" data-cancel>Cancel ❌</button>
+            <div class="screen__top" data-prev-operation></div>
+            <div class="screen__bottom" data-curr-operation></div>
+        </div>
+        <div class="keypad">
+            <div class="keypad__left">
+                <button data-number>1</button>
+                <button data-number>2</button>
+                <button data-number>3</button>
+                <button data-number>4</button>
+                <button data-number>5</button>
+                <button data-number>6</button>
+                <button data-number>7</button>
+                <button data-number>8</button>
+                <button data-number>9</button>
+                <button data-number>0</button>
+                <button data-number>.</button>
+                <button class="lightred" data-delete>DEL</button>
+            </div>
+            <div class="keypad__right">
+                <!-- Changing data-entry references here will break the summary and entries -->
+                <!-- be sure to match the reference names in script.js render functions too -->
+                <button class="lightyellow" data-operation="tp" data-entry="Freshly baked Bread" data-class="lightyellow"> Freshly baked Bread <img src="C:\peralta\bread.jpg"></button>
+                <button class="lightblue" data-operation="tp" data-entry="Whole wheat loaf" data-class="lightblue">Whole wheat loaf <img src="C:\peralta\IMAGE\loaf.jpg"></button>
+                <button class="lightyellow" data-operation="tp" data-entry="cake" data-class="lightyellow">cake <img src="C:\peralta\IMAGE\cake.jpg"></button>
+             <button class="lightblue" data-operation="tp" data-entry="Vanilla cupcake" data-class="lightblue"> Vanilla CupCake <img src="C:\peralta\IMAGE\vanilla-cupcake.jpg"></button>
+                <button class="lightyellow" data-operation="tp" data-entry="Chocolate cake" data-class="lightyellow">Chocolate cake <img src="C:\peralta\IMAGE\chocolate.jpg"></button>
+                <button class="lightgreen" data-operation="tp" data-entry="Money-In" data-class="lightgreen">Money-In 💰 </button>
+                <button class="lightred" data-operation="tn" data-entry="Money-Out" data-class="lightred">Money-Out💸</button>
+                <button class="lightred" data-void data-entry="Void" data-class="lightred">Void🚫</button>
+            </div>
+        </div>
+        <div class="keypad__options">
+            <div class="keypad__options__left">
+                <h4 class="span-3">Payment Methods</h4>
+                <button class="darkgreen" data-payment="pm" data-entry="Cash" disabled>💸</button>
+                <button class="darkgreen" data-payment="pm" data-entry="Check" disabled>CH</button>
+                <button class="darkgreen" data-payment="pm" data-entry="Card" disabled>💳</button>
+            </div>
+            <div class="keypad__options__right">
+                <button class="span-2 enter" data-enter disabled>ENTER</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        //---> SELECTORS
+
+// side panel
+const sidebar = document.querySelector('[data-sidebar]')
+const openBtn = document.querySelector('[data-open]')
+const closeBtn = document.querySelector('[data-close]')
+
+// cash register init form
+const cashInitForm = document.querySelector('[data-cash-init-form]')
+const cashInitInput = document.querySelector('[data-cash-init-value]')
+const submitBtn = document.querySelector('[data-cash-init-submit]')
+const amendBtn = document.querySelector('[data-cash-init-clear]')
+const resetRegisterBtn = document.querySelector('[data-register-reset]')
+
+// display
+const displayVoidMode = document.querySelector('[data-display]')
+const cancelBtn = document.querySelector('[data-cancel]')
+const restartBtn = document.querySelector('[data-restart]')
+const prevDisplayText = document.querySelector('[data-prev-operation]')
+const currDisplayText = document.querySelector('[data-curr-operation]')
+
+// keypad buttons
+const numbers = document.querySelectorAll('[data-number]')
+const operations = document.querySelectorAll('[data-operation]')
+const payments = document.querySelectorAll('[data-payment]')
+const deleteBtn = document.querySelector('[data-delete]')
+const voidBtn = document.querySelector('[data-void]')
+const enterBtn = document.querySelector('[data-enter]')
+
+// data summary entries
+const copyBtn = document.querySelector('[data-copy-btn]')
+const copyAreaClipboard = document.querySelector('[data-area-clipboard]')
+const sumInitValue = document.querySelector('[data-init-value]')
+const sumCoffeTotal = document.querySelector('[data-coffe-total]')
+const sumBeerTotal = document.querySelector('[data-beer-total]')
+const sumDrinkTotal = document.querySelector('[data-drink-total]')
+const sumBurgerTotal = document.querySelector('[data-burger-total]')
+const sumSandwichTotal= document.querySelector('[data-sandwich-total]')
+const sumMoneyInTotal = document.querySelector('[data-money-in-total]')
+const sumMoneyOutTotal = document.querySelector('[data-money-out-total]')
+const sumVoidsTotal = document.querySelector('[data-voids-total]')
+const sumPaymCashTotal = document.querySelector('[data-payment-cash-total]')
+const sumPaymCheckTotal = document.querySelector('[data-payment-check-total]')
+const sumPaymCardTotal = document.querySelector('[data-payment-card-total]')
+const sumGrandTotal = document.querySelector('[data-grand-total]')
+
+// entries html
+const entriesCount = document.querySelector('[data-entries-count]')
+const entriesHtml = document.querySelector('[data-entries]')
+
+//---> SETUP TODAY'S DATE
+
+const date = new Date().toLocaleDateString("en-GB", {year:"numeric", day:"2-digit", month:"2-digit"})
+const dateElem = document.querySelector('[data-date]')
+dateElem.innerText = date
+
+//---> LOCALSTORAGE KEYS CONSTANTS
+
+const LS_CASH_INIT_VALUE = 'register.cashInitValue'
+const LS_REGISTER_ENTRIES = 'register.entriesData'
+const LS_REGISTER_TIMESTAMP = 'register.timestamp'
+
+// local storage data
+let savedEntriesData = JSON.parse(localStorage.getItem(LS_REGISTER_ENTRIES)) || []
+let initAmount = localStorage.getItem(LS_CASH_INIT_VALUE) || ''
+
+//---> FUNCTIONS
+
+// open sidebar
+function openSidebar() {
+    sidebar.style.width = '250px';
+}
+
+// close sidebar
+function closeSidebar() {
+    sidebar.style.width = '0';
+}
+
+// save entries to localstarage
+function saveEntriesData() {
+    localStorage.setItem(LS_REGISTER_ENTRIES, JSON.stringify(savedEntriesData))
+}
+
+// save cash init value to localStorage
+function saveCashInitValue(e) {
+    e.preventDefault()
+
+    if (initAmount !== '') {
+        alert('You have already registered the Initial Amount!')
+        resetInput()
+        closeSidebar()
+        return
+    }
+
+    initAmount = cashInitInput.value
+    localStorage.setItem(LS_CASH_INIT_VALUE, initAmount)
+    localStorage.setItem(LS_REGISTER_TIMESTAMP, Date.now())
+
+    resetInput()
+    renderSummaryPane()
+    closeSidebar()
+}
+
+// reset input on form submit
+function resetInput() {
+    cashInitInput.value = 0
+}
+
+// check for real data existance
+function isRealObject(obj) {
+    return obj && obj !== "null" && obj!== "undefined";
+}
+
+// copy summary text to clipboard
+function copyToClipboard(elemtext) {
+    const copyText = elemtext.innerText
+    const textarea = document.createElement('textarea')
+
+    document.body.appendChild(textarea)
+    textarea.value = `REGISTER SUMMARY\n${date}\n\n${copyText}`
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
+    alert('Register Summary copied to clipboard!')
+}
+
+// render entries template
+function renderTemplate(data) {
+    const date = new Date(data.timestamp)
+    const time = `${date.getHours() < 10 ? '0' + date.getHours().toString() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes().toString() : date.getMinutes()}`
+
+    entriesHtml.insertAdjacentHTML('afterbegin', `
+        <div class="entrie__section ${data.class} ${data.voidStatus && 'entrie__voidMode'}">
+            <p>${data.transactionName} &raquo;&raquo; ${data.transactionValue}</p>
+            <p>${data.tenderName} &raquo;&raquo; ${data.tenderValue}</p>
+            <p>Change &raquo;&raquo; ${data.change}</p>
+            <p>Time &raquo;&raquo; ${time}</p>
+        </div>
+    `)
+}
+
+// rounding accurately to n decimal places
+function roundToTwoDecimals(n, d) {
+    // where n = number, and d = decimal places
+    return Number(Math.round(n + 'e' + d) + 'e-' + d)
+}
+
+// render summary pane
+function renderSummaryPane() {
+
+    const initValue = initAmount === '' ? '0.00' : initAmount
+
+    sumInitValue.innerText = initValue
+
+    if (isRealObject(savedEntriesData)) {
+
+        const coffeTotal = roundToTwoDecimals(savedEntriesData.map(({transactionName: name, transactionValue: value}) => ({name, value}))
+            .filter(e => e.name == 'Coffe')
+            .reduce((a,cv) => a + parseFloat(cv.value), 0), 2)
+        sumCoffeTotal.innerText = coffeTotal != 0 ? coffeTotal : '0.00'
+
+        const beerTotal = roundToTwoDecimals(savedEntriesData.map(({transactionName: name, transactionValue: value}) => ({name, value}))
+            .filter(e => e.name == 'Beer')
+            .reduce((a,cv) => a + parseFloat(cv.value), 0), 2)
+        sumBeerTotal.innerText = beerTotal != 0 ? beerTotal : '0.00'
+
+        const drinkTotal = roundToTwoDecimals(savedEntriesData.map(({transactionName: name, transactionValue: value}) => ({name, value}))
+            .filter(e => e.name == 'Drink')
+            .reduce((a,cv) => a + parseFloat(cv.value), 0), 2)
+        sumDrinkTotal.innerText = drinkTotal != 0 ? drinkTotal : '0.00'
+
+        const burgerTotal = roundToTwoDecimals(savedEntriesData.map(({transactionName: name, transactionValue: value}) => ({name, value}))
+            .filter(e => e.name == 'Burger')
+            .reduce((a,cv) => a + parseFloat(cv.value), 0), 2)
+        sumBurgerTotal.innerText = burgerTotal != 0 ? burgerTotal : '0.00'
+
+        const sandwichTotal = roundToTwoDecimals(savedEntriesData.map(({transactionName: name, transactionValue: value}) => ({name, value}))
+            .filter(e => e.name == 'Sandwich')
+            .reduce((a,cv) => a + parseFloat(cv.value), 0), 2)
+        sumSandwichTotal.innerText = sandwichTotal != 0 ? sandwichTotal : '0.00'
+
+        const moneyInTotal = roundToTwoDecimals(savedEntriesData.map(({transactionName: name, transactionValue: value}) => ({name, value}))
+            .filter(e => e.name == 'Money-In')
+            .reduce((a,cv) => a + parseFloat(cv.value), 0), 2)
+        sumMoneyInTotal.innerText = moneyInTotal != 0 ? moneyInTotal : '0.00'
+
+        const moneyOutTotal = roundToTwoDecimals(savedEntriesData.map(({transactionName: name, transactionValue: value}) => ({name, value}))
+            .filter(e => e.name == 'Money-Out')
+            .reduce((a,cv) => a + parseFloat(cv.value), 0), 2)
+        sumMoneyOutTotal.innerText = moneyOutTotal != 0 ? moneyOutTotal : '0.00'
+
+        const voidsTotal = roundToTwoDecimals(savedEntriesData.map(({voidAmount}) => ({voidAmount}))
+            .reduce((a,cv) => a + parseFloat(cv.voidAmount), 0), 2)
+        sumVoidsTotal.innerText = voidsTotal != 0 ? voidsTotal : '0.00'
+
+        const paymCashTotal = roundToTwoDecimals(savedEntriesData.map(({tenderName: name, tenderAmountIn: value}) => ({name, value}))
+            .filter(e => e.name == 'Cash')
+            .reduce((a,cv) => a + parseFloat(cv.value), 0)  + parseFloat(initValue), 2)
+        sumPaymCashTotal.innerText = paymCashTotal != 0 ? paymCashTotal : '0.00'
+
+        const paymCheckTotal = roundToTwoDecimals(savedEntriesData.map(({tenderName: name, tenderAmountIn: value}) => ({name, value}))
+            .filter(e => e.name == 'Check')
+            .reduce((a,cv) => a + parseFloat(cv.value), 0), 2)
+        sumPaymCheckTotal.innerText = paymCheckTotal != 0 ? paymCheckTotal : '0.00'
+
+        const paymCardTotal = roundToTwoDecimals(savedEntriesData.map(({tenderName: name, tenderAmountIn: value}) => ({name, value}))
+            .filter(e => e.name == 'Card')
+            .reduce((a,cv) => a + parseFloat(cv.value), 0), 2)
+        sumPaymCardTotal.innerText = paymCardTotal != 0 ? paymCardTotal : '0.00'
+        
+        const grandTotal = roundToTwoDecimals(savedEntriesData.map(({transactionValue}) => ({transactionValue}))
+            .reduce((a,cv) => a + parseFloat(cv.transactionValue) , 0) + parseFloat(initValue), 2)
+        sumGrandTotal.innerText = grandTotal != 0 ? grandTotal : '0.00'
+
+        entriesCount.innerText = savedEntriesData.length
+
+    } else {
+        sumCoffeTotal.innerText = '0.00'
+        sumBeerTotal.innerText = '0.00'
+        sumDrinkTotal.innerText = '0.00'
+        sumBurgerTotal.innerText = '0.00'
+        sumMoneyInTotal.innerText = '0.00'
+        sumMoneyOutTotal.innerText = '0.00'
+        sumSandwichTotal.innerText = '0.00'
+        sumVoidsTotal.innerText = '0.00'
+        sumPaymCashTotal.innerText = initValue
+        sumPaymCheckTotal.innerText = '0.00'
+        sumPaymCardTotal.innerText = '0.00'
+        sumGrandTotal.innerText = initValue
+        entriesCount.innerText = '0'
+    }
+}
+
+// render entries pane
+function renderEntriesPane() {
+
+    if (isRealObject(savedEntriesData)) {
+
+        // reset entriesHtml before update
+        entriesHtml.innerHTML = ''
+
+        savedEntriesData.sort((a,b) => a.timestamp > b.timestamp).forEach(e => {
+            const data = {
+                timestamp: e.timestamp,
+                class: e.class,
+                transactionName: e.transactionName,
+                transactionValue: e.transactionValue,
+                tenderName: e.tenderName,
+                tenderValue: e.tenderValue,
+                change: e.change,
+                voidStatus: e.voidStatus
+            }
+            renderTemplate(data)
+        })
+    } else {
+        // reset entriesHtml anyway
+        entriesHtml.innerHTML = ''
+    }
+}
+
+//---> CASH INIT FORM LISTENERS
+
+cashInitInput.addEventListener('input', () => {
+    cashInitInput.value = cashInitInput.value.replace(/[^.\d]/g, '')
+    .replace(/^(\d*\.?)|(\d*)\.?/g, "$1$2")
+})
+
+submitBtn.addEventListener('click', saveCashInitValue)
+
+amendBtn.addEventListener('click', (e) => {
+    e.preventDefault()
+
+    if (initAmount === '') {
+        alert('Nothing to modify, you must first register the Initial Amount!')
+        closeSidebar()
+        return
+    }
+
+    alert('The Initial Amount has been eliminated, you can now enter a new value!')
+    localStorage.removeItem(LS_CASH_INIT_VALUE)
+    // localStorage.removeItem(LS_REGISTER_TIMESTAMP)
+    initAmount = ''
+    renderSummaryPane()
+})
+
+resetRegisterBtn.addEventListener('click', (e) => {
+    e.preventDefault()
+
+    if (savedEntriesData.length < 1 && initAmount === '') {
+        alert('Nothing to delete!')
+        closeSidebar()
+        return
+    }
+
+    if (confirm('All data entered will be deleted. Are you sure you want to proceed with this operation?')) {
+        // reset our local variables and localstorage items
+        savedEntriesData = []
+        initAmount = ''
+        
+        localStorage.removeItem(LS_CASH_INIT_VALUE)
+        localStorage.removeItem(LS_REGISTER_ENTRIES)
+        localStorage.removeItem(LS_REGISTER_TIMESTAMP)
+
+        // reset entriesHtml
+        renderSummaryPane()
+        renderEntriesPane()
+        closeSidebar()
+    }
+})
+
+openBtn.addEventListener('click', openSidebar)
+
+closeBtn.addEventListener('click', closeSidebar)
+
+copyBtn.addEventListener('click', () => {
+    copyToClipboard(copyAreaClipboard)
+})
+
+//---> REGISTER CLASS
+
+class Register {
+    constructor(prevDisplayText, currDisplayText) {
+        this.prevDisplayText = prevDisplayText
+        this.currDisplayText = currDisplayText
+        this.allClear()
+    }
+
+    allClear() {
+        this.prevDisplayText.removeAttribute('data-before')
+        this.prevDisplayText.innerText = ''
+        this.currDisplayText.removeAttribute('data-before')
+        this.currDisplayText.innerText = ''
+        this.transaction = ''
+        this.payment = ''
+        this.entry = ''
+        this.entryTran = ''
+        this.entryPaym = ''
+        this.tempEntry = ''
+        this.className = ''
+        this.currentEntry = ''
+        this.operation = undefined
+        this.change = ''
+        this.voidMode = false
+        this.voidModeAmount = ''
+    }
+
+    delete() {
+        this.currentEntry = this.currentEntry.toString().slice(0, -1)
+    }
+
+    appendNumber(number) {
+        if (number === '.' && this.currentEntry.includes('.')) return
+        this.currentEntry = this.currentEntry.toString() + number.toString()
+        // console.log('currentEntry >>>', this.currentEntry)
+    }
+
+    enableEnter() {
+        enterBtn.removeAttribute('disabled')
+        this.disableAllButEnter()
+    }
+
+    disableEnter() {
+        enterBtn.setAttribute('disabled', 'disabled')
+    }
+
+    disableAllButEnter() {
+        numbers.forEach(e => e.setAttribute('disabled', 'disabled'))
+        operations.forEach(e => e.setAttribute('disabled', 'disabled'))
+        payments.forEach(e => e.setAttribute('disabled', 'disabled'))
+        deleteBtn.setAttribute('disabled', 'disabled')
+        voidBtn.setAttribute('disabled', 'disabled')
+    }
+
+    enablePayments() {
+        payments.forEach(e => e.removeAttribute('disabled'))
+    }
+
+    enableAllButEnter() {
+        numbers.forEach(e => e.removeAttribute('disabled'))
+        operations.forEach(e => e.removeAttribute('disabled'))
+        deleteBtn.removeAttribute('disabled')
+        voidBtn.removeAttribute('disabled')
+    }
+
+    resetBtShowHide() {
+        restartBtn.classList.toggle('hidden')
+    }
+
+    resetScreen() {
+        this.allClear()
+        this.enableAllButEnter()
+        this.resetBtShowHide()
+        this.removeVoidMode()
+    }
+
+    cancelBtShowHide() {
+        cancelBtn.classList.toggle('hidden')
+    }
+
+    cancelOperation() {
+        this.allClear()
+        this.enableAllButEnter()
+        this.cancelBtShowHide()
+        this.removeVoidMode()
+    }
+
+    removeVoidMode() {
+        displayVoidMode.classList.remove('voidMode')
+        voidBtn.classList.remove('voidBtnOn')
+    }
+
+    voidTransaction() {
+        if (this.voidMode) {
+            this.voidMode = false
+            this.removeVoidMode()
+            // console.log('void >>>', this.voidMode)
+        } else {
+            this.voidMode = true
+            displayVoidMode.classList.add('voidMode')
+            voidBtn.classList.add('voidBtnOn')
+            // console.log('void >>>', this.voidMode)
+        }
+    }
+
+    chooseOperation(type, entry, className) {
+        if (this.currentEntry === '') return
+
+        this.operation = type
+        this.entry = entry
+
+        if (this.operation === 'tp') {
+            this.transaction = this.voidMode ? `-${this.currentEntry}` : this.currentEntry
+            this.entryTran = entry
+            this.className = className
+            this.voidModeAmount = this.voidMode ? this.currentEntry : 0
+            this.enablePayments()
+        } else if (this.operation === 'tn') {
+            this.transaction = this.voidMode ? this.currentEntry : `-${this.currentEntry}`
+            this.payment = 0
+            this.entryTran = entry
+            this.entryPaym = 'Cash'
+            this.tempEntry = 'Cash'
+            this.currentEntry = this.payment
+            this.className = className
+            this.voidModeAmount = this.currentEntry ? this.transaction : 0
+            this.updateDisplay()
+            this.enableEnter()
+            this.cancelBtShowHide()
+            return
+        } else {
+            this.payment = this.voidMode ? `-${this.currentEntry}` : this.currentEntry
+            this.entryPaym = entry
+            if (parseFloat(this.payment) < parseFloat(this.transaction)) {
+                this.operation = 'tp'
+                this.currentEntry = ''
+                this.payment = ''
+                this.entryPaym = ''
+                alert(`The Payment Method cannot be less than the transaction, try again!`)
+                this.updateDisplay()
+                return
+            }
+            this.enableEnter()
+            this.cancelBtShowHide()
+        }
+        
+        this.currentEntry = ''
+    }
+    
+    entriesData() {
+        const data = {
+            timestamp: Date.now(),
+            class: this.className,
+            transactionName: this.entryTran,
+            transactionValue: this.transaction,
+            tenderName: this.entryPaym,
+            tenderValue: this.payment,
+            tenderAmountIn: this.transaction,
+            voidStatus: this.voidMode,
+            voidAmount: this.voidModeAmount,
+            change: this.change
+        }
+
+        savedEntriesData.push(data)
+        // console.log('savedEntriesData', savedEntriesData)
+
+        // only render the current entry object
+        renderTemplate(data)
+        
+        // save data to local storage
+        saveEntriesData()
+        // this renders the whole localStorage object. now it'd done on page reload
+        //renderEntriesPane()
+    }
+
+    roundAccurately(n, d) {
+        // where n = number, and d = decimal places
+        return Number(Math.round(n + 'e' + d) + 'e-' + d)
+    }
+
+    compute() {
+        const tran = parseFloat(this.transaction)
+        const paym = parseFloat(this.payment)
+        if (isNaN(tran) || isNaN(paym)) return
+        this.change = this.operation === 'tn' ? this.roundAccurately(Math.abs(tran), 2) : this.roundAccurately((paym - tran), 2)
+        // this.operation = undefined
+        // this.transaction = ''
+        // this.payment = ''
+        // this.currentEntry = ''
+    }
+
+    formatNumber(number) {
+        const stringNum = number.toString()
+        const intDigits = parseFloat(stringNum.split('.')[0])
+        const decimalDigits = stringNum.split('.')[1]
+        let intDisplay
+        if (isNaN(intDigits)) {
+            intDisplay = ''
+        } else {
+            intDisplay = intDigits.toLocaleString('en-GB', {
+                maximumFractionDigits: 0
+            })
+        }
+        if (decimalDigits != null) {
+            return `${intDisplay}.${decimalDigits}`
+        } else {
+            return intDisplay
+        }
+    }
+
+    updateDisplay() {
+        this.currDisplayText.innerText = this.formatNumber(this.currentEntry)
+        switch(this.operation) {
+            case 'tp': 
+                this.prevDisplayText.innerText = this.formatNumber(this.transaction)
+                this.prevDisplayText.setAttribute('data-before', this.entry)
+                break
+            case 'tn': 
+                this.prevDisplayText.innerText = this.formatNumber(this.transaction)
+                this.prevDisplayText.setAttribute('data-before', this.entry)
+                this.currDisplayText.innerText = this.formatNumber(this.payment)
+                this.currDisplayText.setAttribute('data-before', this.tempEntry)
+                break
+            case 'pm': 
+                this.prevDisplayText.innerText = this.formatNumber(this.transaction)
+                this.prevDisplayText.setAttribute('data-before', this.entryTran)
+                this.currDisplayText.innerText = this.formatNumber(this.payment)
+                this.currDisplayText.setAttribute('data-before', this.entryPaym)
+                break
+            default:
+                this.prevDisplayText.innerText = ''
+        }
+    }
+
+    updateDisplayFinal() {
+        this.compute()
+        if (this.change === '') return
+        this.prevDisplayText.innerText = ''
+        this.prevDisplayText.removeAttribute('data-before')
+        this.currDisplayText.innerText = `£ ${this.formatNumber(this.change)}`
+        this.currDisplayText.setAttribute('data-before', 'CHANGE')
+        this.entriesData()
+        this.resetBtShowHide()
+        this.cancelBtShowHide()
+        this.disableEnter()
+        // console.log('operation >>>', this.operation)
+        // console.log('transaction >>>', this.transaction)
+        // console.log('transaction entry >>>', this.entryTran)
+        // console.log('payment >>>', this.payment)
+        // console.log('payment entry >>>', this.entryPaym)
+        // console.log('change >>>', this.change)
+        // console.log('class >>>', this.className)
+        // console.log('void >>>', this.voidMode)
+    }
+}
+
+//---> SETUP REGISTER
+
+const register = new Register(prevDisplayText, currDisplayText)
+
+//---> REGISTER LISTENERS
+
+numbers.forEach(number => {
+    number.addEventListener('click', () => {
+        register.appendNumber(number.innerText)
+        register.updateDisplay()
+    })
+})
+
+deleteBtn.addEventListener('click', () => {
+    register.delete()
+    register.updateDisplay()
+})
+
+operations.forEach(operation => {
+    operation.addEventListener('click', () => {
+        register.chooseOperation(operation.dataset.operation, operation.dataset.entry, operation.dataset.class)
+        register.updateDisplay()
+    })
+})
+
+payments.forEach(payment => {
+    payment.addEventListener('click', () => {
+        register.chooseOperation(payment.dataset.payment, payment.dataset.entry, '')
+        register.updateDisplay()
+    })
+})
+
+voidBtn.addEventListener('click', () => {
+    register.voidTransaction()
+})
+
+enterBtn.addEventListener('click', () => {
+    register.updateDisplayFinal()
+    renderSummaryPane()
+    // renderEntriesPane()
+})
+
+restartBtn.addEventListener('click', () => {
+    register.resetScreen()
+})
+
+cancelBtn.addEventListener('click', () => {
+    register.cancelOperation()
+})
+
+//---> ToDo
+// const numbersKeysAndDot = [48,96,49,97,50,98,51,99,52,100,53,101,54,102,55,103,56,104,57,105,110,190]
+// const deleteKeys = [8,46]
+// const escapeKey = 27
+// const enterKey = 13
+
+// if (initAmount != 0) {
+//     document.addEventListener('keydown', e => {
+//         console.log(e)
+//         e.preventDefault();
+//         if (numbersKeysAndDot.indexOf(e.keyCode) >= 0) {
+//             register.appendNumber(e.key)
+//             register.updateDisplay()
+//         } else if (deleteKeys.indexOf(e.keyCode) >= 0) {
+//             register.delete()
+//             register.updateDisplay()
+//         } else if (escapeKey === e.keyCode) {
+//             register.allClear()
+//         } else if (enterKey === e.keyCode) {
+//             register.updateDisplayFinal()
+//         }  else {
+//             return false;
+//         }
+//     })
+// }
+
+//---> LOAD SAVED DATA ON REFRESH
+
+if (savedEntriesData.length > 0 || initAmount !== '') {
+    renderSummaryPane()
+    renderEntriesPane()
+}
+</script>
+</body>
+</html>
